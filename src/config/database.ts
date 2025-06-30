@@ -27,7 +27,7 @@ export const sequelize = new Sequelize('lms', 'avnadmin',process.env.AEVIN_PASSW
       require: true,
       rejectUnauthorized: false 
     }
-  },
+  },  
   pool: {
     max: 1,   
     min: 0,

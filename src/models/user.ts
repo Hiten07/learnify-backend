@@ -20,6 +20,7 @@ import { submission } from "./submissions";
 import bcrypt from "bcrypt";
 import { Role } from "./Role";
 import { Userrole } from "./Userrole";
+import { Op } from "sequelize";
 
 export enum userRole {
   ADMIN = "admin",
@@ -29,15 +30,18 @@ export enum userRole {
 
 @Table({
   scopes: {
-    students: {
-      where: { role: "student" },
-    },
-    instructors: {
-      where: { role: "instructor" },
-    },
     withEmail(email: string) {
       return {
         where: { email },
+      };
+    },
+    accessLevel(value) {
+      return {
+        where: {
+          accessLevel: {
+            [Op.gte]: value,
+          },
+        },
       };
     },
   },
@@ -45,7 +49,6 @@ export enum userRole {
   timestamps: true,
   paranoid: true,
 })
-
 export class user extends Model {
   @PrimaryKey
   @AutoIncrement
@@ -115,7 +118,7 @@ export class user extends Model {
 
   @HasMany(() => submission)
   submissions!: submission[];
-  
+
   @BelongsToMany(() => Role, () => Userrole)
   Roles!: Role[];
 
@@ -128,4 +131,3 @@ export class user extends Model {
     }
   }
 }
-

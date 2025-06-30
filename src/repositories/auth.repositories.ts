@@ -87,12 +87,15 @@ export const userRepository = {
   //   }
   // },
 
-  async findByEmail(email: string) {
-    return await user.findOne({
-      where: { email },
-    });
-  },
+  // async findByEmail(email: string) {
+  //   return await user.scope([{ method: ['withEmail', email] }, 
+  //                           { method: ['accessLevel',19]  }]).findOne();
+  // },
 
+  async findByEmail(email: string) {
+    return await user.scope({ method: ['withEmail', email]}).findOne();
+  },
+  
   async insertOtp(ota: userOtpData) {
     return await otp.create(ota);
   },

@@ -12,8 +12,9 @@ export interface userVerify {
 }
 
 export interface userLogin {
-  email: string;
-  password: string;
+  email: string,
+  password: string,
+  role: string
 }
 
 export interface userSignupDetails {

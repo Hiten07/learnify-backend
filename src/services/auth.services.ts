@@ -121,8 +121,10 @@ export const authService = {
     }
     return insertOtp;
   },
+
   async login(data: userLogin) {
     const user = await userRepository.findEmailExists(data.email);
+
     if (!user) {
       throw new customError(
         "USER_NOT_FOUND",
@@ -141,17 +143,25 @@ export const authService = {
 
     const roles =
       user.Roles?.map((role: Role) => {
-        return role.rolename;
+        return role.dataValues.rolename;
       }) || [];
 
-    const payload = {
-      id: user.id,
-      email: user.email,
-      roles: roles,
-    };
+    if (roles.includes(data.role)) {
+      const payload = {
+        id: user.id,
+        email: user.email,
+        roles: data.role,
+      };
 
-    const token = await generateToken(payload);
-    return token;
+      const token = await generateToken(payload);
+      return token;
+    } 
+    else {
+      throw new customError(
+        "ROLE_NOT_FOUND",
+        `You are not allowed to login with ${data.role}, please contact administrator...`
+      );
+    }
   },
 
   // async login(data: userLogin) {

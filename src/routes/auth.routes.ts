@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { authController } from "../controllers/auth.controller";
 import { verifyToken } from "../middlewares/verifyToken";
+import { authValidations } from "../middlewares/joivalidations";
 
 const router = Router();
 /**
@@ -88,7 +89,7 @@ const router = Router();
  *                   example: User already exists
  */
 
-router.post("/register", authController.signup);
+router.post("/register",authValidations.signupschema,authController.signup);
 
 /**
  * @swagger
@@ -245,7 +246,7 @@ router.post("/register/verify", authController.verify);
  *                   type: string
  *                   example: "Invalid credentials"
  */
-router.post("/login", authController.login);
+router.post("/login",authValidations.loginschema,authController.login);
 
 router.post("/addrolespermission", authController.addrolepermission);
 

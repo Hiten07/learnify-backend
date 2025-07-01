@@ -5,11 +5,8 @@ import { diff_minutes } from "../utils/helper";
 import { sendMail } from "../utils/mailer";
 import { JwtPayload } from "jsonwebtoken";
 import { otp } from "../models/otp";
-import {
-  userSignupDetailsWithoutRoleAndID,
-  userVerify,
-  userLogin,
-} from "../types/interfaces";
+import { userVerify } from "../types/interfaces";
+import { userSignupDetailsWithoutRoleAndID,UserLoginDetails } from "../types/customtypes";
 import { instructordetails } from "../models/instructor";
 import { customError } from "../errors/customError";
 import { Role } from "../models/Role";
@@ -122,7 +119,7 @@ export const authService = {
     return insertOtp;
   },
 
-  async login(data: userLogin) {
+  async login(data: UserLoginDetails) {
     const user = await userRepository.findEmailExists(data.email);
 
     if (!user) {
@@ -133,7 +130,7 @@ export const authService = {
     }
 
     const isPasswordCorrect = await bcrypt.compare(
-      data.password,
+      data.password as string,
       user.dataValues.password
     );
 

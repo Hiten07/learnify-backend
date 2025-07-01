@@ -1,3 +1,5 @@
+import { userSignupDetails } from "./interfaces";
+
 export type userOtpData  = {
   email: string,
   otp: number
@@ -53,3 +55,13 @@ export type instructorDetails = {
   bio: string,
   experience: number
 }
+
+export type userSignupDetailsWithoutRoleAndID = Omit<
+  userSignupDetails,
+  "id" | "role"
+>;
+
+export type UserLoginDetails = Pick<
+  userSignupDetails,
+  "email" | "password" | "role"
+>;

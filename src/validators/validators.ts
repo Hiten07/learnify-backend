@@ -39,7 +39,7 @@ export const signupjoischema = Joi.object({
     password: Joi.string()
     .min(6)
     .max(20)
-    .custom((value,helper) => {
+    .custom((value: string,helper: Joi.CustomHelpers) => {
       if (!value.match(/\d/) || !value.match(/[a-zA-Z]/)) {
         return helper.message({
           custom: "Password must contain at least 1 letter and 1 number.",

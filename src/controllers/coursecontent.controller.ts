@@ -5,7 +5,8 @@ import { courseContentService } from "../services/coursecontent.services";
 export const CourseContentController = {
 
   async getModulesWithLessons(req: Request, res: Response) {
-    const courseid = parseInt(req.params?.courseid);
+    // const courseid = parseInt(req.params?.courseid);
+    const courseid = Number(req.query.courseid);
     const user = req.user;
 
     try {
@@ -13,7 +14,7 @@ export const CourseContentController = {
       if (user?.role === "student") {
         const enrolled = await courseService.checkEnrolledStudent(user?.id, courseid);
         if (!enrolled) {
-          res.status(403).json({ error: "You are not enrolled in this course" });
+          res.status(403).json({ message: "You are not enrolled in this course" });
           return;
         }
       }
@@ -22,11 +23,9 @@ export const CourseContentController = {
       const modules = await courseContentService.getModulesByCourseId(courseid);
 
       if (!modules || modules.length === 0) {
-        res.status(404).json({ error: "No modules found for this course" });
+        res.status(404).json({ message: "No modules found for this course" });
         return;
       }
-
-      console.log(modules);
 
       // For each module fetch lessons ordered by 'order'
       const modulesWithLessons = await Promise.all(
@@ -45,7 +44,7 @@ export const CourseContentController = {
       res.status(200).json(modulesWithLessons);
     } catch (error) {
       console.error(error);
-      res.status(500).json({ error: "Failed to retrieve course content" });
+      res.status(500).json({ message: "Failed to retrieve course content" });
     }
   }
 }

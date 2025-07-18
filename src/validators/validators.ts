@@ -1,5 +1,4 @@
-import Joi from "joi";
-import { or } from "sequelize";
+import Joi from "joi"
 
 export const signupjoischema = Joi.object({
   firstname: Joi

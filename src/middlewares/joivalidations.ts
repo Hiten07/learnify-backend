@@ -9,7 +9,7 @@ export const authValidations = {
       if (error) {
         res.status(401).json({
           data: null,
-          msg: error.details[0].message,
+          message: error.details[0].message,
         });
       } 
       else {

@@ -1,6 +1,7 @@
 import express from 'express';
 import { sequelize } from './config/database';
-const cookieParser = require("cookie-parser")
+const cookieParser = require("cookie-parser");
+import cors from "cors";
 import authRoutes from './routes/auth.routes';
 import courseRoutes  from './routes/course.routes';
 import studentRoutes from './routes/students.routes';
@@ -10,10 +11,16 @@ import assignmentRoutes from './routes/assignment.routes';
 import "../src/cron/cron-notifications"
 import {swaggerUi,specs} from "./swagger";
 
-
 const app = express();
 const PORT = process.env.PORT || 3007;
 
+
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    credentials: true
+  })
+)
 
 app.use(express.json());
 app.use(cookieParser());

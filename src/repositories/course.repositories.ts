@@ -9,6 +9,27 @@ import { user } from "../models/user";
 import { addDays } from "date-fns";
 import { lessons } from "../models/lessons";
 import { submission } from "../models/submissions";
+import { sequelize } from "../config/database";
+
+
+type Lesson = {
+  title: string;
+  description: string;
+  video: FileList;
+  pdf?: FileList;
+};
+
+type Module = {
+  title: string;
+  description: string;
+  lessons: Lesson[];
+};
+
+type Coursedata = {
+  title: string;
+  description: string;
+  modules: Module[];
+};
 
 export const courseRepositories = {
   async findByUserId(id: number) {
@@ -71,6 +92,48 @@ export const courseRepositories = {
       offset: paginationData.offset,
     });
   },
+
+// async createCourseWithModuleAndLessons (courseCreationData: Coursedata) {
+//   const { title, description, modules } = courseCreationData;
+
+//   const t = await sequelize.transaction();
+
+//   try {
+//     const coursecreated = await course.create({ title, description }, { transaction: t });
+
+//     let order=1;
+//     for (const moduleData of modules) {
+//       const createdModule = await coursemodule.create(
+//         {
+//           title: moduleData.title,
+//           description: moduleData.description, 
+//           courseid: coursecreated.id,
+//           order: order++
+//         },
+//         { transaction: t }
+//       );
+
+//       for (const lesson of moduleData.lessons) {
+
+//         await lessons.create(
+//           {
+//             title: lesson.title,
+//             description: lesson.description,
+//             moduleid: createdModule.id,
+//             videoUrl,
+//             pdfUrl,
+//           },
+//           { transaction: t }
+//         );
+//       }
+//     }
+
+//     await t.commit();
+//     return t;
+//   } catch (err) {
+//     await t.rollback();
+//   }
+// },
 
   async create(courseCreationData: courseDetails) {
     return course.create(courseCreationData);
@@ -154,7 +217,6 @@ export const courseRepositories = {
   },
 
   async getAllCoursesOfInstructor(instructorid: number,paginationData: paginationData) {
-    console.log(paginationData.search)
     return course.findAndCountAll({
       where: {
         instructorid: instructorid,

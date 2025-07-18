@@ -74,17 +74,18 @@ export const authController = {
         });
       }
     } catch (error) {
+      console.log(error)
       if (error instanceof customError) {
         if (error.name === "OTP_EXPIRED") {
           res.status(400).json({
             message: error.error,
           });
         } else if (error.name === "INVALID_OTP") {
-          res.status(400).json({
+          res.status(401).json({
             message: error.error,
           });
         } else {
-          res.status(400).json({
+          res.status(403).json({
             message: error.error,
           });
         }
@@ -99,7 +100,7 @@ export const authController = {
   async login(req: Request, res: Response) {
     try {
       const isLogin = await authService.login(req.body);
-      res.cookie("token", isLogin);
+      res.cookie("authtoken", isLogin);
       res.status(200).json({
         message: "Login successfully done",
         token: isLogin,
@@ -112,7 +113,7 @@ export const authController = {
             message: error.error,
           });
         } else if (error.name === "USER_NOT_FOUND") {
-          res.status(404).json({
+          res.status(401).json({
             message: error.error,
           });
         } else {

@@ -54,7 +54,7 @@ export const courseController = {
 
   async addModuleToCourse(req: Request, res: Response) {
     try {
-      const courseid = Number(req.params?.courseid);
+      const courseid = Number(req.query?.courseid);
       const result = await courseService.addModule(courseid, req.body);
       if (result) {
         response(res, result, "Course module added successfully");
@@ -69,11 +69,12 @@ export const courseController = {
       const files = req.files as {
         [fieldname: string]: Express.Multer.File[];
       };
+
       if (!files || !files.videos || files.videos.length === 0) {
-        res.status(400).json({ error: "video files are required uploaded" });
+        res.status(400).json({ error: "video files are required" });
       }
 
-      const moduleid = parseInt(req.params?.moduleid);
+      const moduleid = Number(req.query?.moduleid);
 
       const lessonData = {
         moduleid: moduleid,
@@ -86,15 +87,18 @@ export const courseController = {
         Object.assign(lessonData, { fileUrl: files.docs[0].path });
       }
 
-      const result = await courseService.addLessonToModule(
-        lessonData,
-        moduleid
-      );
-
-      response(res, result, "lesson added successfully to the module");
+      console.log(files)
+      if(files) {
+        const result = await courseService.addLessonToModule(
+          lessonData,
+          moduleid
+        );
+        response(res, result, "lesson added successfully to the module");
+      }
+    
     } catch (error: unknown) {
       console.error("Cloudinary upload error:", error);
-
+  
       if (error instanceof customError) {
         if (error.name === "MODULE_NOT_FOUND")
           res.status(400).json({
@@ -230,11 +234,11 @@ export const courseController = {
 
   async getAllInstructorCourses(req: Request, res: Response) {
     try {
-      const page = Number(req.query.page) || 0;
+      const page = Number(req.query.page) || 1;
 
       const limit = Number(req.query.pageSize) || 5;
 
-      const offset = page * limit;
+      const offset = (page * limit) - limit;
 
       const sortBy = String(req.query.sortBy) || "duration";
 

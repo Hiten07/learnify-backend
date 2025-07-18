@@ -5,8 +5,6 @@ import { validateparams } from '../utils/validateparams';
 
 const router = Router();
 
-router.get("/:courseid",verifyToken(['instructor']),validateparams([
-    { name: "courseid",type: "number" }
-]),CourseContentController.getModulesWithLessons);
+router.get("/",verifyToken(['instructor','student']),CourseContentController.getModulesWithLessons);
 
 export default router;

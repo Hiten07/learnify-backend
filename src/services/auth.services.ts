@@ -63,14 +63,15 @@ export const authService = {
     const otp_created = new Date(storedOtp?.dataValues.createdAt) as Date;
     const current_timestamp = new Date(Date.now()) as Date;
 
-    if (otp != storedOtp?.dataValues?.otp) {
+    console.log(storedOtp?.dataValues.otp)
+    if (otp != storedOtp?.dataValues?.otp && diff_minutes(current_timestamp, otp_created) < 1) {
       throw new customError("INVALID_OTP", "Invalid OTP");
     }
 
     console.log(diff_minutes(current_timestamp, otp_created));
     if (diff_minutes(current_timestamp, otp_created) > 1) {
       const result = await this.regenerateOtp(decoded.email);
-
+  
       if (result.dataValues) {
         throw new customError(
           "OTP_EXPIRED",
@@ -81,7 +82,7 @@ export const authService = {
       }
     }
 
-    await userRepository.deleteotp(otp);
+    // await userRepository.deleteotp(otp);
     const user = {
       firstname: decoded.firstname,
       lastname: decoded.lastname,
@@ -125,7 +126,7 @@ export const authService = {
     if (!user) {
       throw new customError(
         "USER_NOT_FOUND",
-        "User does not exist, please create an account"
+        "Invalid crdentials, please try again..."
       );
     }
 
@@ -135,7 +136,7 @@ export const authService = {
     );
 
     if (!isPasswordCorrect) {
-      throw new customError("INVALID_CREDENTIALS", "Invalid credentials");
+      throw new customError("INVALID_CREDENTIALS", "Invalid credentials, please try again");
     }
 
     const roles =

@@ -357,26 +357,20 @@ router.post(
 );
 
 router.post(
-  "/:courseid/module",
+  "/module",
   verifyToken(["instructor"]),
-  validateparams([
-    {
-      name: "courseid",
-      type: "number",
-    },
-  ]),
   courseController.addModuleToCourse
 );
 
 
 router.post(
-  "/module/:moduleid/lessons",
+  "/module/lessons",
   verifyToken(["instructor"]),
+  checkPermission('createLessons'),
   upload.fields([
     { name: "videos", maxCount: 1 },
     { name: "docs", maxCount: 1 },
   ]),
-  checkPermission('createLessons'),
   courseController.addModuleLesson
 );
 

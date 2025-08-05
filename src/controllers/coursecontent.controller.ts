@@ -3,18 +3,21 @@ import { courseService } from "../services/course.service";
 import { courseContentService } from "../services/coursecontent.services";
 
 export const CourseContentController = {
-
   async getModulesWithLessons(req: Request, res: Response) {
     // const courseid = parseInt(req.params?.courseid);
     const courseid = Number(req.query.courseid);
     const user = req.user;
 
     try {
-      
-      if (user?.role === "student") {
-        const enrolled = await courseService.checkEnrolledStudent(user?.id, courseid);
+      if (user?.roles === "student") {
+        const enrolled = await courseService.checkEnrolledStudent(
+          user?.id,
+          courseid
+        );
         if (!enrolled) {
-          res.status(403).json({ message: "You are not enrolled in this course" });
+          res
+            .status(403)
+            .json({ message: "You are not enrolled in this course" });
           return;
         }
       }
@@ -30,23 +33,25 @@ export const CourseContentController = {
       // For each module fetch lessons ordered by 'order'
       const modulesWithLessons = await Promise.all(
         modules.map(async (module: any) => {
-          const lessons = await courseContentService.getLessonsByModuleId(module.id);
+          const lessons = await courseContentService.getLessonsByModuleId(
+            module.id
+          );
           return {
             id: module.id,
             title: module.title,
             description: module.description,
             order: module.order,
-            lessons: lessons || []
+            lessons: lessons || [],
           };
         })
       );
 
-      res.status(200).json(modulesWithLessons);
+      res.status(200).json({
+        message: "course content fetched successfully",
+        data: modulesWithLessons
+      });
     } catch (error) {
-      console.error(error);
       res.status(500).json({ message: "Failed to retrieve course content" });
     }
-  }
-}
-
-
+  },
+};

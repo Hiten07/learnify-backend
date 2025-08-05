@@ -3,9 +3,8 @@ import { customError } from "../errors/customError";
 import { courseRepositories } from "../repositories/course.repositories";
 import { course } from "../models/course";
 import { coursemodule } from "../models/coursemodule";
-import { courseDetails2,lessonsObj } from "../types/customtypes";
+import { courseDetails2, lessonsObj } from "../types/customtypes";
 import { paginationData } from "../types/interfaces";
-
 
 export const courseService = {
   async courseCreatedByInstructor(courseid: number, instructorid: number) {
@@ -21,22 +20,65 @@ export const courseService = {
     }
   },
 
-  async createCourse(data: courseDetails2, user: JwtPayload | undefined) {
-      const details = await courseRepositories.findByUserId(user?.id);
+  async deleteModuleFromCourse(moduleid: number) {
+    return await courseRepositories.deleteModuleByID(moduleid);
+  },
 
-      if(!details) {
-        throw new customError("NOT_FOUND","something went worong");
+  async getLastOrderOfModuleCourse(courseid: number) {
+    const result = await courseRepositories.getLastOrderOfModuleCourse(courseid);
+
+    if (!result) {
+      throw new customError(
+        "NO_MODULE_FOUND",
+        "NO module found for course."
+      );
+    }
+    return result;
+  },
+
+  async getAllCourses(paginationData: paginationData) {
+    try {
+      const result = await courseRepositories.getAllCoursesForStudent(
+        paginationData
+      );
+      if (result) {
+        return result;
       }
+    } catch (error) {
+      console.log(error)
+    }
+  },
 
-      const coursedata = {
-        coursename: data.coursename,
-        courseprice: data.courseprice,
-        description: data.description,
-        duration: data.duration,
-        instructorid: details?.dataValues.id as number,
-      };
-      return await courseRepositories.create(coursedata);
+  async getInstructorCoursesHistory(instructorid: number) {
+    const result = await courseRepositories.findInstructorCoursesHistory(
+      instructorid
+    );
 
+    if (!result) {
+      throw new customError(
+        "INSTRUCTOR_ACCESS_DENIED",
+        "You can only check history of the courses created by you."
+      );
+    }
+
+    return result;
+  },
+
+  async createCourse(data: courseDetails2, user: JwtPayload | undefined) {
+    const details = await courseRepositories.findByUserId(user?.id);
+
+    if (!details) {
+      throw new customError("NOT_FOUND", "something went worong");
+    }
+
+    const coursedata = {
+      coursename: data.coursename,
+      courseprice: data.courseprice,
+      description: data.description,
+      duration: data.duration,
+      instructorid: details?.dataValues.id as number,
+    };
+    return await courseRepositories.create(coursedata);
   },
 
   async updateCourse(data: course, courseid: number) {
@@ -78,8 +120,10 @@ export const courseService = {
     }
   },
 
-
-  async getAllCoursesOfInstructor(instructorid: number,paginationData: paginationData) {
+  async getAllCoursesOfInstructor(
+    instructorid: number,
+    paginationData: paginationData
+  ) {
     const allCourses = await courseRepositories.getAllCoursesOfInstructor(
       instructorid,
       paginationData
@@ -92,6 +136,20 @@ export const courseService = {
       );
     }
     return allCourses;
+  },
+
+  async getCoursesAllAssignments(studentid: number,paginationData: paginationData) {
+    try {
+      const allAssignments = await courseRepositories.getAllCoursesAssignments(
+        studentid,
+        paginationData
+      );
+      if (allAssignments) {
+        return allAssignments;
+      }
+    } catch (error) {
+      console.log(error);
+    }
   },
 
   async updateSubmissionRemarks(
@@ -121,8 +179,14 @@ export const courseService = {
     return await courseRepositories.addLessonForModule(data);
   },
 
-  async getAllCoursesForStudent(userid: number,paginationData: paginationData) {
-    return await courseRepositories.findAllCoursesForStudent(userid,paginationData);
+  async getAllCoursesForStudent(
+    userid: number,
+    paginationData: paginationData
+  ) {
+    return await courseRepositories.findAllCoursesForStudent(
+      userid,
+      paginationData
+    );
   },
 
   async getAllStudentsOfCourse(courseid: number, instructorid: number) {
@@ -162,7 +226,7 @@ export const courseService = {
 
     return isEnrolled;
   },
-  
+
   async enrolledCourse(userid: number, courseid: number) {
     const course = await courseRepositories.findCourseDetailsById(courseid);
 
@@ -209,4 +273,4 @@ export const courseService = {
   },
 };
 
-export {lessonsObj}
+export { lessonsObj };

@@ -5,7 +5,6 @@ import {checkPermission} from "../middlewares/checkPersmission";
 import { courseController } from "../controllers/course.controller";
 import { upload } from "../utils/cloudinary";
 import { validateparams } from "../utils/validateparams";
-import { assignmentController } from "../controllers/assignment.controller";
 const router = Router();
 
 /**
@@ -356,12 +355,36 @@ router.post(
   courseController.createCourse
 );
 
+
 router.post(
   "/module",
   verifyToken(["instructor"]),
   courseController.addModuleToCourse
 );
 
+router.delete(
+  "/module/delete",
+  verifyToken(["instructor"]),
+  courseController.deleteModuleFromCourse
+);
+
+router.get(
+  "/module/order",
+  verifyToken(["instructor"]),
+  courseController.getLastOrderOfModule
+);
+
+router.post(
+  "/update/:courseid",
+  verifyToken(["instructor"]),
+  validateparams([
+    {
+      name: "courseid",
+      type: "number",
+    },
+  ]),
+  courseController.updateCourseDetails
+);
 
 router.post(
   "/module/lessons",
@@ -374,9 +397,16 @@ router.post(
   courseController.addModuleLesson
 );
 
+
+router.get(
+  "/history",
+  verifyToken(["instructor"]),
+  courseController.getInstructorCoursesHistory
+);
+
 router.put(
   "/update/:courseid",
-  verifyToken(["instruct  or"]),
+  verifyToken(["instructor"]),
   validateparams([
     {
       name: "courseid",

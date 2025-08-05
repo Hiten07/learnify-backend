@@ -105,13 +105,13 @@ export class user extends Model {
   updatedAt?: Date;
 
   @HasOne(() => instructordetails)
-  instrucion!: instructordetails;
+  instructordetails!: instructordetails;
 
   @HasMany(() => course, "instructorid")
   instructor!: course[];
 
   @HasMany(() => enrolled)
-  students!: enrolled;
+  students!: enrolled[];
 
   @BelongsToMany(() => course, () => enrolled)
   users!: course[];

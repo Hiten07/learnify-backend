@@ -3,7 +3,7 @@ import { courseService } from "../services/course.service";
 import { customError } from "../errors/customError";
 import { catchResponse, response } from "../errors/helperError";
 import { assignmentService } from "../services/assignment.service";
-import { paginationData } from "../types/interfaces";
+import { FindAndCountAllType, paginationData } from "../types/interfaces";
 import { paginationresponse } from "../utils/paginationData";
 
 export const courseController = {
@@ -12,6 +12,9 @@ export const courseController = {
       const result = await courseService.createCourse(req.body, req.user);
       if (result) {
         response(res, result, "Course created successfully");
+      }
+      else {
+        response(res, null, "something went wrong while creating course...");
       }
     } catch (error) {
       if (error instanceof customError) {
@@ -28,6 +31,21 @@ export const courseController = {
     }
   },
 
+  async getLastOrderOfModule(req: Request,res: Response) {
+    try {
+      const courseid = Number(req.query?.courseid);
+      const result = await courseService.getLastOrderOfModuleCourse(courseid);
+      if (result) {
+        response(res, result, "Course module order fetched successfully");
+      }
+     else {
+      response(res, null, "something went wrong while updating course...");
+     }
+    } catch (error) {
+      console.log(error)
+    }
+  },
+
   async updateCourseDetails(req: Request, res: Response) {
     try {
       const courseid = Number(req.params?.courseid);
@@ -35,6 +53,9 @@ export const courseController = {
       if (result) {
         response(res, result, "Course updated successfully");
       }
+     else {
+      response(res, null, "something went wrong while updating course...");
+     }
     } catch (error) {
       catchResponse(res, error as Error);
     }
@@ -47,6 +68,13 @@ export const courseController = {
       if (result) {
         response(res, result, "Course updated successfully");
       }
+     else {
+      response(
+        res,
+        null,
+        "something went wrong while creating lesson course..."
+      );
+     }
     } catch (error) {
       catchResponse(res, error as Error);
     }
@@ -58,7 +86,16 @@ export const courseController = {
       const result = await courseService.addModule(courseid, req.body);
       if (result) {
         response(res, result, "Course module added successfully");
+        console.log(result)
       }
+      else {
+        console.log("object,")
+      response(
+        res,
+        null,
+        "something went wrong while creating course module..."
+      );
+    }
     } catch (error) {
       catchResponse(res, error as Error);
     }
@@ -76,6 +113,7 @@ export const courseController = {
 
       const moduleid = Number(req.query?.moduleid);
 
+      console.log(files)
       const lessonData = {
         moduleid: moduleid,
         title: req.body.title,
@@ -87,18 +125,25 @@ export const courseController = {
         Object.assign(lessonData, { fileUrl: files.docs[0].path });
       }
 
-      console.log(files)
-      if(files) {
+      if (files) {
         const result = await courseService.addLessonToModule(
           lessonData,
           moduleid
         );
-        response(res, result, "lesson added successfully to the module");
+        if(result) {
+          response(res, result, "lesson added successfully to the module");
+        }
       }
-    
+      else {
+        response(
+          res,
+          null,
+          "something went wrong while creating lesson course..."
+        );
+      }
     } catch (error: unknown) {
       console.error("Cloudinary upload error:", error);
-  
+
       if (error instanceof customError) {
         if (error.name === "MODULE_NOT_FOUND")
           res.status(400).json({
@@ -109,7 +154,53 @@ export const courseController = {
             message: "Internal server error",
           });
         }
+      } 
+    }
+  },
+
+  async deleteModuleFromCourse(req: Request,res: Response) {
+    try {
+      const moduleid = Number(req.query.moduleid);
+      const result = await courseService.deleteModuleFromCourse(moduleid);
+      response(res,result,"module deleted successfully");
+    } catch (error) {
+      catchResponse(res,error as Error);
+    }
+  },
+
+  async getStudentAllCourses(req: Request, res: Response) {
+    const page = Number(req.query.page) || 1;
+    const limit = Number(req.query.pageSize) || 6;
+    const offset = page * limit - limit;
+    const sortBy = (req.query.sortBy as string) || "duration";
+    const sortType = req.query.sortType === "asc" ? "ASC" : "DESC";
+    const search = (req.query.search as string) || "";
+    const paginationData: paginationData = {
+      limit: limit,
+      offset: offset,
+      sortBy: sortBy,
+      sortType: sortType,
+      search: search,
+    };
+
+    try {
+      if (req.user || req.user!.roles === "student") {
+        const allCourses = await courseService.getAllCourses(paginationData);
+        const result = paginationresponse(
+          allCourses as FindAndCountAllType,
+          page,
+          limit
+        );
+        response(res, result, "all courses");
+      } else {
+        res.status(401).json({
+          message: "Not allowed",
+        });
       }
+    } catch (error) {
+      res.status(500).json({
+        message: "Internal server error",
+      });
     }
   },
 
@@ -159,8 +250,44 @@ export const courseController = {
       );
       if (assignments!.length > 0) {
         response(res, assignments, "Assignments retrieved successfully");
-      } else {
-        res.status(404).json({ error: "No assignments found for this course" });
+      }
+      res.status(404).json({ error: "No assignments found for this course" });
+    } catch (error) {
+      res
+        .status(500)
+        .json({ error: "An error occurred while retrieving assignments" });
+    }
+  },
+
+  async getStudentallAssignments(req: Request, res: Response) {
+    try {
+      const page = Number(req.query.page) || 1;
+      const limit = Number(req.query.pageSize)|| 6;
+      const offset = page * limit - limit;
+      const sortBy = String(req.query.sortBy) || "title";
+      const sortType = req.query.sortType === "asc" ? "ASC" : "DESC";
+      const search = (req.query.search as string) || "";
+
+      const paginationData: paginationData = {
+        limit: limit,
+        offset: offset,
+        sortBy: sortBy,
+        sortType: sortType,
+        search: search,
+      };
+
+      const studentId = req.user?.id;
+      const AllAssignments = await courseService.getCoursesAllAssignments(
+        studentId,
+        paginationData
+      );
+
+      if (AllAssignments) {
+        const result = paginationresponse(AllAssignments, page, limit);
+        response(res, result, "assignments fetched");
+      }
+      else {
+        response(res, null, "no assignments fetched");
       }
     } catch (error) {
       console.log(error);
@@ -172,20 +299,13 @@ export const courseController = {
 
   async getStudentCourses(req: Request, res: Response) {
     try {
-      const page = Number(req.query.page) || 0;
-
-      const limit = Number(req.query.pageSize) || 5;
-
-      const offset = page * limit;
-
+      const page = Number(req.query.page) || 1;
+      const limit = Number(req.query.pageSize) || 6;
+      const offset = page * limit - limit;
       const sortBy = String(req.query.sortBy) || "title";
-
       const sortType = req.query.sortType === "asc" ? "ASC" : "DESC";
-
       const userid = req.user?.id;
-
       const search = (req.query.search as string) || "";
-
       const paginationData: paginationData = {
         limit: limit,
         offset: offset,
@@ -235,19 +355,12 @@ export const courseController = {
   async getAllInstructorCourses(req: Request, res: Response) {
     try {
       const page = Number(req.query.page) || 1;
-
-      const limit = Number(req.query.pageSize) || 5;
-
-      const offset = (page * limit) - limit;
-
+      const limit = Number(req.query.pageSize) || 6;
+      const offset = page * limit - limit;
       const sortBy = String(req.query.sortBy) || "duration";
-
       const sortType = req.query.sortType === "asc" ? "ASC" : "DESC";
-
       const userid = req.user?.id;
-
       const search = (req.query.search as string) || "";
-
       const paginationData: paginationData = {
         limit: limit,
         offset: offset,
@@ -278,6 +391,24 @@ export const courseController = {
     }
   },
 
+  async getInstructorCoursesHistory(req: Request, res: Response) {
+    try {
+      const instructorId = req.user?.id;
+
+      const courseHistoryDetails =
+        await courseService.getInstructorCoursesHistory(instructorId);
+
+      res.status(200).json({
+        message: "enrolled courses history with user details",
+        data: courseHistoryDetails,
+      });
+    } catch (error) {
+      res.status(500).json({
+        message: "Internal server error",
+      });
+    }
+  },
+
   async getCourseDetailsById(req: Request, res: Response) {
     try {
       const courseid = parseInt(req.params?.courseid);
@@ -293,7 +424,6 @@ export const courseController = {
             message: error.error,
           });
       } else {
-        console.log(error);
         res.status(500).json({
           message: "Internal server error",
         });

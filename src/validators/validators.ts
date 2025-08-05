@@ -57,12 +57,9 @@ export const signupjoischema = Joi.object({
     }),
 
 
-  role: Joi.array()
-        .items(Joi.string())  
+  role:Joi.string() 
         .min(1)
         .required().messages({
-    "array.base": "Role must be an array of strings",
-    "array.min": "At least one role is required",
     "any.required": "Role is required",
   }),
 });

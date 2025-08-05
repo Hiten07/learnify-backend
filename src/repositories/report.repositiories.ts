@@ -64,7 +64,7 @@ export const reportRepositories = {
         title: course.coursename,
         description: course.description,
 
-        enrolleds: course.courses.map((enrolled) => ({
+        enrolleds: course.enrolledcourses.map((enrolled) => ({
           student: enrolled.users,
         })),
       })),

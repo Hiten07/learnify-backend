@@ -9,11 +9,11 @@ import courseContentRoutes from "./routes/coursecontent.routes";
 import progressRoutes from "./routes/progress.routes";
 import assignmentRoutes from './routes/assignment.routes';
 import "../src/cron/cron-notifications"
-import {swaggerUi,specs} from "./swagger";
+import { swaggerUi,specs } from "./swagger";
+import { initSocket } from './utils/socket';
 
 const app = express();
 const PORT = process.env.PORT || 3007;
-
 
 app.use(
   cors({
@@ -40,12 +40,13 @@ app.use('/enrollcourses',progressRoutes);
 const start = async () => {
   try {
     await sequelize.authenticate();
-    await sequelize.sync({ alter: true});
+    await sequelize.sync({ alter: true });
     console.log('✅ Database connected');
 
-    app.listen(PORT, () => {
+    const server = app.listen(PORT, () => {
       console.log(`🚀 Server running on http://localhost:${PORT}`);
     });
+    initSocket(server);
   } catch (err) {
     console.error('❌ Failed to start app:', err);
   }

@@ -7,7 +7,8 @@ import { Error } from "sequelize";
 export const lessonController = {
   async getCourseProgress(req: Request, res: Response) {
     try {
-      const courseid = parseInt(req.params?.courseid);
+      const courseid = Number(req.query?.courseid);
+      console.log(courseid)
       const result = await lessonService.updateTrackProgress(
         req.user?.id,
         courseid
@@ -16,8 +17,11 @@ export const lessonController = {
       if (result) {
         response(res, result, "Track progress fetched successfully");
       }
+      else {
+        response(res, null, "Something went wrong");
+      }
     } catch (error) {
-      console.log(error);
+      console.log(error)
       if (error instanceof customError) {
         if (error.name == "NO_LESSONS") {
           res.status(401).json({
@@ -28,6 +32,8 @@ export const lessonController = {
             message: "Internal server error",
           });
         }
+      } else {
+        catchResponse(res,error as Error);
       }
     }
   },
@@ -62,16 +68,11 @@ export const lessonController = {
           if (result) {
             response(res, result, "Lesson marked as completed");
           }
-        } 
-        
-        else if (!completed && !trackprogress1.iscompleted) {
+        } else if (!completed && !trackprogress1.iscompleted) {
           response(res, result, "Lesson already added");
-        }
-        
-        else {
+        } else {
           response(res, result, "Lesson already completed");
         }
-        
       } else {
         response(res, result, "Lesson added successfully");
       }

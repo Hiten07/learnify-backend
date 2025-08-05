@@ -8,9 +8,11 @@ import {
   ForeignKey,
   CreatedAt,
   UpdatedAt,
-  BelongsTo
+  BelongsTo,
+  HasMany
 } from "sequelize-typescript";
 import { course } from "../models/course";
+import { submission } from "./submissions";
 
 @Table({ tableName: "assignments", timestamps: true, paranoid: true })
 export class assignment extends Model {
@@ -62,7 +64,9 @@ export class assignment extends Model {
   })
   updatedAt?: Date;
 
-
+  @HasMany(() => submission,{as: "submissions"})
+  submissions!: submission[];
+  
   @BelongsTo(() => course)
-  courses!: course;
+  course!: course;
 }

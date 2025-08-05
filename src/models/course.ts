@@ -10,8 +10,8 @@ import {
     BelongsToMany,
     HasMany,
   } from "sequelize-typescript";
-  import { user } from '../models/user';
-  import { enrolled } from '../models/enrolled';
+import { user } from '../models/user';
+import { enrolled } from '../models/enrolled';
 import { assignment } from "./assignment";
 import { coursemodule } from "./coursemodule";
 
@@ -62,11 +62,11 @@ import { coursemodule } from "./coursemodule";
   @BelongsToMany(() => user, () => enrolled)
   students!: user[];
 
-  @HasMany(() => assignment) 
+  @HasMany(() => assignment,{as: "assignments"}) 
   assignments!: assignment[]
 
   @HasMany(() => enrolled)
-  courses!: enrolled[];
+  enrolledcourses!: enrolled[];
 
   @HasMany(() => coursemodule) 
   coursemodules!: coursemodule[];

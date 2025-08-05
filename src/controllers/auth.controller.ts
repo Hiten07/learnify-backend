@@ -30,6 +30,7 @@ export const authController = {
       if (result) {
         response(res, result, "successfully transferred roles");
       }
+      response(res, null, "something went wrong");
     } catch (error) {
       console.log(error);
       catchResponse(res, error as Error);
@@ -46,6 +47,7 @@ export const authController = {
           token: token,
         });
       }
+      response(res, null, "something went wrong during");
     } catch (error) {
       if (error instanceof customError) {
         if (error.name === "USER_EXISTS") {
@@ -73,8 +75,10 @@ export const authController = {
           message: "Registration successfully done",
         });
       }
+
+      response(res, null, "something went wrong during registeration");
     } catch (error) {
-      console.log(error)
+      console.log(error);
       if (error instanceof customError) {
         if (error.name === "OTP_EXPIRED") {
           res.status(400).json({
@@ -129,6 +133,19 @@ export const authController = {
     }
   },
 
+  async instructorProfileDetails(req: Request, res: Response) {
+    try {
+      const result = await authService.getInstructorProfileDetails(
+        req?.user?.id
+      );
+      response(res, result, "Profile details of instructor");
+    } catch (error) {
+      res.status(400).json({
+        message: error,
+      });
+    }
+  },
+
   async instructorDetails(req: Request, res: Response) {
     try {
       const result = await authService.addInstructorDetails(
@@ -142,6 +159,7 @@ export const authController = {
           message: "Instructor details added successfully",
         });
       }
+      response(res, null, "something went wrong");
     } catch (error) {
       if (error instanceof customError) {
         if (error.name == "NOT_ALLOWED") {

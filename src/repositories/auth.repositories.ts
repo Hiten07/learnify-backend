@@ -7,6 +7,7 @@ import { Permission } from "../models/Permission";
 import { Rolespermissions } from "../models/Rolespermission";
 import { Userrole } from "../models/Userrole";
 import { userSignupDetails } from "../types/interfaces";
+import { Model, where } from "sequelize";
 
 export const userRepository = {
   async assignPermissionToRoles(
@@ -133,8 +134,7 @@ export const userRepository = {
             rolename: userobj.role,
           },
         });
-        
-        console.log(result2);
+
         let count = 0;
 
         for (const role of result2) {
@@ -142,6 +142,7 @@ export const userRepository = {
             userid: result.dataValues.id,
             roleid: role.dataValues.id,
           });
+
           if(resultcnt) {
             count++;
           }
@@ -168,6 +169,21 @@ export const userRepository = {
 
   async createInstructorDetails(data: instructorDetails) {
     return await instructordetails.create(data);
+  },
+  
+  async getProfileDetails(instructorid: number) {
+    return await user.findOne({
+      where: {
+        id: instructorid,
+        
+      },
+      include: [
+        {
+         model: instructordetails,
+         as: "instructordetails"
+        }
+       ]
+    })
   },
 
   async otpCheckRegenerate(email: string) {

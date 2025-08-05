@@ -4,6 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "dev": "npx ts-node --files src/index.ts",
+    "build": "tsc",
     "start": "npx ts-node --files src/index.ts",
     "migration:create": "npx sequelize-cli migration:generate",
     "migration:run": "npx sequelize-cli db:migrate"
@@ -14,9 +16,11 @@
   "dependencies": {
     "@types/ejs": "^3.1.5",
     "@types/jsonwebtoken": "^9.0.9",
+    "@types/socket.io": "^3.0.1",
     "bcrypt": "^6.0.0",
     "cloudinary": "^1.41.3",
     "cookie-parser": "^1.4.7",
+    "cookies": "^0.9.1",
     "cors": "^2.8.5",
     "cron": "^4.3.1",
     "date-fns": "^4.1.0",
@@ -24,6 +28,7 @@
     "express": "^4.21.2",
     "joi": "^17.13.3",
     "jsonwebtoken": "^9.0.2",
+    "jwt-decode": "^4.0.0",
     "multer": "^2.0.1",
     "multer-cloudinary": "^1.1.0",
     "multer-storage-cloudinary": "^4.0.0",
@@ -35,11 +40,16 @@
     "puppeteer": "^24.10.1",
     "sequelize": "^6.37.7",
     "sequelize-typescript": "^2.1.6",
+    "socket.io": "^4.8.1",
+    "socket.io-client": "^4.8.1",
+    "socket.io-cookie": "^0.0.1",
+    "socket.io-cookie-parser": "^1.0.0",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1"
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.2",
+    "@types/cookie": "^0.6.0",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.3",
     "@types/multer": "^1.4.13",

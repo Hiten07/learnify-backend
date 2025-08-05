@@ -311,4 +311,6 @@ router.post("/addrolespermission", authController.addrolepermission);
  */  
 router.post("/instructor/details",verifyToken(["instructor"]), authController.instructorDetails);
 
+router.get("/instructor/profile",verifyToken(["instructor"]), authController.instructorProfileDetails);
+
 export default router;

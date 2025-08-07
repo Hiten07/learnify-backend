@@ -104,7 +104,7 @@ export const authController = {
   async login(req: Request, res: Response) {
     try {
       const isLogin = await authService.login(req.body);
-      res.cookie("authtoken", isLogin);
+      res.cookie("authtoken", isLogin,{sameSite: "none",httpOnly: true,secure: true});
       res.status(200).json({
         message: "Login successfully done",
         token: isLogin,

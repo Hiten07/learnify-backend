@@ -16,9 +16,10 @@ const app = express();
 const PORT = process.env.PORT || 3007;
 
 app.use(
-  cors({
-    origin: process.env.FRONT_END_URL,
-    methods:['get','post','put','patch','delete'],
+  cors({ 
+    // origin: process.env.FRONT_END_URL,
+    origin: '*',  
+    methods:['GET','POST','PUT','PATCH','DELETE'],
     credentials: true
   })
 )

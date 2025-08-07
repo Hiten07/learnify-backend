@@ -17,8 +17,7 @@ const PORT = process.env.PORT || 3007;
 
 app.use(
   cors({ 
-    // origin: process.env.FRONT_END_URL,
-    origin: '*',  
+    origin: ['https://learnify-frontend-lovat.vercel.app/','https://localhost:5173'],  
     methods:['GET','POST','PUT','PATCH','DELETE'],
     credentials: true
   })

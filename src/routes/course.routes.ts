@@ -5,7 +5,7 @@ import {checkPermission} from "../middlewares/checkPersmission";
 import { courseController } from "../controllers/course.controller";
 import { upload } from "../utils/cloudinary";
 import { validateparams } from "../utils/validateparams";
-const router = Router();
+const   router = Router();
 
 /**
  * @swagger
